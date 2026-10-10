@@ -8,6 +8,20 @@ export default {
   theme: {
     extend: {
       colors: {
+        midnight: {
+          950: '#050811',
+          900: '#080D1A',
+          850: '#0C1324',
+          800: '#111A30',
+          750: '#16223E',
+          700: '#1E2C4F',
+          600: '#2A3C69',
+        },
+        electric: {
+          blue: '#60A5FA',
+          violet: '#A78BFA',
+          cyan: '#22D3EE',
+        },
         navy: {
           50: '#f0f4f8',
           100: '#d9e2ec',
@@ -27,10 +41,19 @@ export default {
           emerald: '#10b981',
           emeraldDark: '#047857',
           cyan: '#06b6d4',
+          blue: '#2563eb',
+          violet: '#7c3aed',
         }
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+      },
+      boxShadow: {
+        'glass-dark': '0 8px 32px 0 rgba(0, 0, 0, 0.45)',
+        'glass-light': '0 8px 30px 0 rgba(148, 163, 184, 0.15)',
+        'glow-blue': '0 0 25px -5px rgba(96, 165, 250, 0.35)',
+        'glow-cyan': '0 0 25px -5px rgba(34, 211, 238, 0.35)',
+        'glow-violet': '0 0 25px -5px rgba(167, 139, 250, 0.35)',
       }
     },
   },

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../api';
-import { Settings as SettingsIcon, RotateCcw, Upload, Download, CheckCircle, AlertTriangle, ShieldCheck, Database } from 'lucide-react';
+import { Settings as SettingsIcon, RotateCcw, Upload, Download, CheckCircle, AlertTriangle, ShieldCheck, Database, Server, RefreshCw } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
   const [stats, setStats] = useState<any | null>(null);
@@ -72,48 +72,48 @@ export const SettingsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-teal-50 via-white to-slate-50 border border-slate-200/90 shadow-sm">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-200">
-            System Configuration & Management
+      <div className="p-6 rounded-2xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-lg">
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+            System Operations & Configuration
           </span>
-          <span className="text-xs text-slate-500 font-medium">Institutional Settings</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Administration Hub</span>
         </div>
-        <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-          <SettingsIcon className="h-6 w-6 text-teal-600" />
-          <span>System Administration, CSV Import & Dataset Reset</span>
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+          <SettingsIcon className="h-6 w-6 text-cyan-500" />
+          <span>System Administration, Batch Ingestion & Dataset Control</span>
         </h1>
-        <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
-          Manage system operational parameters, import batch academic records, and reset the synthetic demonstration dataset.
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
+          Monitor operational cluster statistics, batch import institutional student attendance and grades, or restore the baseline synthetic evaluation dataset.
         </p>
       </div>
 
       {/* Operational Stats Grid */}
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs text-xs">
-            <span className="text-slate-500 font-medium">Total Users</span>
-            <span className="text-2xl font-bold font-mono text-slate-900 block mt-1">{stats.total_users}</span>
+          <div className="p-4 rounded-xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-xs text-xs">
+            <span className="text-slate-500 dark:text-slate-400 font-medium">Total Users</span>
+            <span className="text-2xl font-black font-mono text-slate-900 dark:text-white block mt-1">{stats.total_users}</span>
           </div>
-          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs text-xs">
-            <span className="text-slate-500 font-medium">Students</span>
-            <span className="text-2xl font-bold font-mono text-teal-700 block mt-1">{stats.total_students}</span>
+          <div className="p-4 rounded-xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-xs text-xs">
+            <span className="text-slate-500 dark:text-slate-400 font-medium">Students</span>
+            <span className="text-2xl font-black font-mono text-cyan-600 dark:text-cyan-400 block mt-1">{stats.total_students}</span>
           </div>
-          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs text-xs">
-            <span className="text-slate-500 font-medium">Courses</span>
-            <span className="text-2xl font-bold font-mono text-slate-900 block mt-1">{stats.total_courses}</span>
+          <div className="p-4 rounded-xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-xs text-xs">
+            <span className="text-slate-500 dark:text-slate-400 font-medium">Courses</span>
+            <span className="text-2xl font-black font-mono text-slate-900 dark:text-white block mt-1">{stats.total_courses}</span>
           </div>
-          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs text-xs">
-            <span className="text-slate-500 font-medium">Concepts</span>
-            <span className="text-2xl font-bold font-mono text-emerald-600 block mt-1">{stats.total_concepts}</span>
+          <div className="p-4 rounded-xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-xs text-xs">
+            <span className="text-slate-500 dark:text-slate-400 font-medium">Concepts</span>
+            <span className="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400 block mt-1">{stats.total_concepts}</span>
           </div>
-          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs text-xs">
-            <span className="text-slate-500 font-medium">Question Attempts</span>
-            <span className="text-2xl font-bold font-mono text-slate-900 block mt-1">{stats.total_attempts}</span>
+          <div className="p-4 rounded-xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-xs text-xs">
+            <span className="text-slate-500 dark:text-slate-400 font-medium">Attempts</span>
+            <span className="text-2xl font-black font-mono text-slate-900 dark:text-white block mt-1">{stats.total_attempts}</span>
           </div>
-          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs text-xs">
-            <span className="text-slate-500 font-medium">Audit Logs</span>
-            <span className="text-2xl font-bold font-mono text-indigo-600 block mt-1">{stats.total_audit_logs}</span>
+          <div className="p-4 rounded-xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-xs text-xs">
+            <span className="text-slate-500 dark:text-slate-400 font-medium">Audit Logs</span>
+            <span className="text-2xl font-black font-mono text-violet-600 dark:text-violet-400 block mt-1">{stats.total_audit_logs}</span>
           </div>
         </div>
       )}
@@ -121,28 +121,28 @@ export const SettingsPage: React.FC = () => {
       {/* Reset Demo Data & CSV Import Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Reset Dataset Card */}
-        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-4">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-rose-50 text-rose-600 border border-rose-200">
+        <div className="p-6 rounded-2xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-md space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20">
               <RotateCcw className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900">
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">
                 Reset Demo Dataset to Initial Clean State
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Restores 35 synthetic students, 4 courses, mapped questions, and Arun Kumar’s initial gap
               </p>
             </div>
           </div>
 
-          <p className="text-xs text-slate-600 leading-relaxed">
+          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
             Use this during your hackathon presentation or evaluation tests if you wish to wipe test modifications and re-run the complete demonstration journey from Step 1.
           </p>
 
           {resetMsg && (
-            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 font-medium">
-              <CheckCircle className="h-4 w-4 shrink-0 text-emerald-600" />
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2 font-medium">
+              <CheckCircle className="h-4 w-4 shrink-0 text-emerald-500" />
               <span>{resetMsg}</span>
             </div>
           )}
@@ -150,7 +150,7 @@ export const SettingsPage: React.FC = () => {
           <button
             onClick={handleResetData}
             disabled={resetting}
-            className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md shadow-rose-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <RotateCcw className={`h-4 w-4 ${resetting ? 'animate-spin' : ''}`} />
             <span>{resetting ? 'Re-seeding Synthetic Database...' : 'Reset & Reload Demo Cohort'}</span>
@@ -158,16 +158,16 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* CSV Import Card */}
-        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-4">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-teal-50 text-teal-600 border border-teal-200">
+        <div className="p-6 rounded-2xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-md space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">
               <Upload className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900">
-                Batch CSV Data Import
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                Batch CSV Data Ingestion
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Validate and ingest student records or attendance files safely
               </p>
             </div>
@@ -175,31 +175,31 @@ export const SettingsPage: React.FC = () => {
 
           <form onSubmit={handleCsvImport} className="space-y-3 text-xs">
             <div>
-              <label className="block text-slate-600 font-semibold mb-1">Import Category</label>
+              <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Import Category</label>
               <select
                 value={importCategory}
                 onChange={(e) => setImportCategory(e.target.value)}
-                className="w-full rounded-xl bg-white border border-slate-300 p-2.5 text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 shadow-2xs"
+                className="w-full rounded-xl bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 p-2.5 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-cyan-500 shadow-2xs"
               >
-                <option value="attendance">Course Attendance Records</option>
-                <option value="students">New Student Profiles</option>
-                <option value="marks">Assessment Marks</option>
+                <option value="attendance" className="text-black dark:text-white dark:bg-slate-900">Course Attendance Records</option>
+                <option value="students" className="text-black dark:text-white dark:bg-slate-900">New Student Profiles</option>
+                <option value="marks" className="text-black dark:text-white dark:bg-slate-900">Assessment Marks</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-slate-600 font-semibold mb-1">CSV File</label>
+              <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">CSV File</label>
               <input
                 type="file"
                 required
                 accept=".csv"
                 onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
-                className="w-full text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-slate-200 file:bg-slate-100 file:text-teal-800 file:font-semibold hover:file:bg-slate-200"
+                className="w-full text-slate-600 dark:text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border file:border-slate-200 dark:file:border-white/10 file:bg-slate-100 dark:file:bg-white/10 file:text-cyan-600 dark:file:text-cyan-400 file:font-semibold hover:file:bg-slate-200"
               />
             </div>
 
             {importResult && (
-              <div className="p-3 rounded-xl bg-teal-50 border border-teal-200 text-teal-800 text-xs font-medium">
+              <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-800 dark:text-cyan-200 text-xs font-medium">
                 Successfully processed {importResult.rows_processed} rows ({importResult.records_imported} imported).
               </div>
             )}
@@ -207,7 +207,7 @@ export const SettingsPage: React.FC = () => {
             <button
               type="submit"
               disabled={importing}
-              className="w-full py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-sm transition-all disabled:opacity-50"
+              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold text-xs shadow-md shadow-cyan-600/25 transition-all disabled:opacity-50"
             >
               {importing ? 'Validating & Importing...' : 'Validate and Import CSV'}
             </button>

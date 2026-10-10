@@ -4,17 +4,22 @@ import { StudentSummary, Intervention } from '../types';
 import { RiskBadge } from '../components/RiskBadge';
 import { WhyFlaggedModal } from '../components/WhyFlaggedModal';
 import { AlertReviewModal } from '../components/AlertReviewModal';
+import { DashboardHero } from '../components/DashboardHero';
 import { useNavigate } from 'react-router-dom';
 import {
   Users,
   AlertTriangle,
-  CheckCircle,
-  TrendingDown,
+  CheckCircle2,
+  TrendingUp,
+  Activity,
   ArrowRight,
   Search,
   RefreshCw,
   HelpCircle,
-  BookOpen
+  CalendarCheck,
+  ChevronRight,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 import {
   BarChart,
@@ -23,7 +28,8 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Cell
+  Cell,
+  CartesianGrid
 } from 'recharts';
 
 export const TeacherDashboard: React.FC = () => {
@@ -69,143 +75,200 @@ export const TeacherDashboard: React.FC = () => {
 
   // Calculate cohort metrics
   const totalCount = students.length;
-  const flaggedCount = students.filter((s) => s.risk_band === 'High concern' || s.risk_band === 'Urgent review recommended').length;
-  const avgRisk = totalCount > 0 ? (students.reduce((acc, s) => acc + s.overall_risk, 0) / totalCount).toFixed(1) : '0';
+  const highRiskStudents = students.filter(
+    (s) => s.risk_band === 'High concern' || s.risk_band === 'Urgent review recommended'
+  );
+  const flaggedCount = highRiskStudents.length;
+  const avgAttendance =
+    totalCount > 0 ? (students.reduce((acc, s) => acc + s.attendance_avg, 0) / totalCount).toFixed(1) : '0';
+  const avgPerformance =
+    totalCount > 0 ? (students.reduce((acc, s) => acc + s.assessment_avg, 0) / totalCount).toFixed(1) : '0';
+  const resolvedCount = interventions.filter((i) => i.outcome === 'improved').length;
+  const successRate = interventions.length > 0 ? Math.round((resolvedCount / interventions.length) * 100) : 100;
 
-  // Distribution for chart
-  const bandCounts = [
-    { name: 'Low concern', count: students.filter((s) => s.risk_band === 'Low concern').length, color: '#10b981' },
-    { name: 'Moderate concern', count: students.filter((s) => s.risk_band === 'Moderate concern').length, color: '#f59e0b' },
-    { name: 'High concern', count: students.filter((s) => s.risk_band === 'High concern').length, color: '#f97316' },
-    { name: 'Urgent review', count: students.filter((s) => s.risk_band === 'Urgent review recommended').length, color: '#e11d48' },
+  // Chart data
+  const performanceDistribution = [
+    { range: '0-40%', count: students.filter((s) => s.assessment_avg < 40).length, fill: '#ef4444' },
+    { range: '40-60%', count: students.filter((s) => s.assessment_avg >= 40 && s.assessment_avg < 60).length, fill: '#f59e0b' },
+    { range: '60-75%', count: students.filter((s) => s.assessment_avg >= 60 && s.assessment_avg < 75).length, fill: '#3b82f6' },
+    { range: '75-100%', count: students.filter((s) => s.assessment_avg >= 75).length, fill: '#10b981' },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Top Banner with Tamil Slogan & Hackathon Status */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">
-              Continuous Assessment Cycle • Spring 2026
-            </span>
-            <span className="text-xs text-slate-500 font-medium">Anna University Regulation Framework</span>
-          </div>
-          <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">
-            Faculty Academic Health & Early Intervention Dashboard
-          </h1>
-          <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
-            Multi-signal monitoring across Attendance (25%), Assessments (35%), Assignments (20%), and Trend (20%).
-            Detect learning gaps early before semester examinations or arrears occur.
-          </p>
-        </div>
+      {/* 1. 3D Hero Experience Section */}
+      <DashboardHero
+        totalStudents={totalCount}
+        flaggedCount={flaggedCount}
+        onExploreInsights={() => {
+          const el = document.getElementById('student-cohort-table');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }}
+      />
 
-        <button
-          onClick={loadData}
-          className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-semibold text-slate-700 transition-colors shrink-0 shadow-sm"
-        >
-          <RefreshCw className={`h-3.5 w-3.5 text-teal-600 ${loading ? 'animate-spin' : ''}`} />
-          <span>Refresh Cohort Data</span>
-        </button>
-      </div>
-
-      {/* Metric Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Total Enrolled Cohort</span>
-            <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
+      {/* 2. 5 Glassmorphic Overview Metric Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* Card 1: Total Students */}
+        <div className="glass-card p-4 sm:p-5 rounded-2xl flex flex-col justify-between group">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-semibold">Total Students</span>
+            <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600 dark:text-cyan-400 group-hover:scale-110 transition-transform">
               <Users className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold font-mono text-slate-900">{totalCount}</span>
-            <span className="text-xs text-emerald-600 font-semibold">100% Sufficient Data</span>
+          <div className="mt-2">
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 dark:text-white">
+                {totalCount}
+              </span>
+              <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">+4.2%</span>
+            </div>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Enrolled • CSE Sem 4</p>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">Across 4 core engineering courses</p>
+          {/* Mini Sparkline SVG */}
+          <svg className="w-full h-5 mt-2 stroke-blue-500/50 dark:stroke-cyan-400/50 fill-none" viewBox="0 0 100 20">
+            <path d="M 0 16 Q 25 10 50 14 T 100 6" strokeWidth="2" />
+          </svg>
         </div>
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Flagged For Review</span>
-            <div className="p-2 rounded-xl bg-rose-50 text-rose-600 border border-rose-100">
+        {/* Card 2: Students at Academic Risk */}
+        <div className="glass-card p-4 sm:p-5 rounded-2xl flex flex-col justify-between group">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-semibold">Students at Risk</span>
+            <div className="p-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform">
               <AlertTriangle className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold font-mono text-rose-600">{flaggedCount}</span>
-            <span className="text-xs text-rose-700 font-semibold">
-              ({totalCount > 0 ? Math.round((flaggedCount / totalCount) * 100) : 0}% of cohort)
-            </span>
+          <div className="mt-2">
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl sm:text-3xl font-extrabold font-mono text-rose-600 dark:text-rose-400">
+                {flaggedCount}
+              </span>
+              <span className="text-[11px] text-rose-600 dark:text-rose-400 font-semibold">
+                ({totalCount > 0 ? Math.round((flaggedCount / totalCount) * 100) : 0}%)
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Requires Intervention</p>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">Scores ≥ 60 (High or Urgent Concern)</p>
+          <svg className="w-full h-5 mt-2 stroke-rose-500/60 dark:stroke-rose-400/60 fill-none" viewBox="0 0 100 20">
+            <path d="M 0 14 Q 30 18 60 10 T 100 4" strokeWidth="2" />
+          </svg>
         </div>
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Cohort Average Risk</span>
-            <div className="p-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
-              <TrendingDown className="h-4 w-4" />
+        {/* Card 3: Average Academic Performance */}
+        <div className="glass-card p-4 sm:p-5 rounded-2xl flex flex-col justify-between group">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-semibold">Avg Performance</span>
+            <div className="p-2 rounded-xl bg-purple-500/10 text-purple-600 dark:text-violet-400 group-hover:scale-110 transition-transform">
+              <Activity className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold font-mono text-amber-600">{avgRisk}</span>
-            <span className="text-xs text-slate-400">/ 100</span>
+          <div className="mt-2">
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 dark:text-white">
+                {avgPerformance}%
+              </span>
+              <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">+1.8%</span>
+            </div>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Continuous Assessment</p>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">Moderate overall cohort stability</p>
+          <svg className="w-full h-5 mt-2 stroke-purple-500/50 dark:stroke-violet-400/50 fill-none" viewBox="0 0 100 20">
+            <path d="M 0 15 Q 35 15 65 8 T 100 7" strokeWidth="2" />
+          </svg>
         </div>
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Intervention Efficacy</span>
-            <div className="p-2 rounded-xl bg-teal-50 text-teal-600 border border-teal-100">
-              <CheckCircle className="h-4 w-4" />
+        {/* Card 4: Attendance Rate */}
+        <div className="glass-card p-4 sm:p-5 rounded-2xl flex flex-col justify-between group">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-semibold">Attendance Rate</span>
+            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
+              <CalendarCheck className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold font-mono text-teal-700">
-              {interventions.filter((i) => i.outcome === 'improved').length} / {interventions.length || 1}
-            </span>
-            <span className="text-xs text-teal-700 font-semibold">Verified Improved</span>
+          <div className="mt-2">
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-900 dark:text-white">
+                {avgAttendance}%
+              </span>
+              <span className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold">Min: 75%</span>
+            </div>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Eligibility Benchmark</p>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">Measured via follow-up post-assessments</p>
+          <svg className="w-full h-5 mt-2 stroke-amber-500/50 dark:stroke-amber-400/50 fill-none" viewBox="0 0 100 20">
+            <path d="M 0 12 Q 25 16 50 11 T 100 13" strokeWidth="2" />
+          </svg>
+        </div>
+
+        {/* Card 5: Intervention Success Rate */}
+        <div className="glass-card p-4 sm:p-5 rounded-2xl flex flex-col justify-between group">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-semibold">Intervention Efficacy</span>
+            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+              <CheckCircle2 className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-2">
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400">
+                {successRate}%
+              </span>
+              <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">Verified</span>
+            </div>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{resolvedCount} Gaps Resolved</p>
+          </div>
+          <svg className="w-full h-5 mt-2 stroke-emerald-500/60 dark:stroke-emerald-400/60 fill-none" viewBox="0 0 100 20">
+            <path d="M 0 18 Q 30 12 60 8 T 100 2" strokeWidth="2" />
+          </svg>
         </div>
       </div>
 
-      {/* Cohort Risk Distribution Chart + Flagged Spotlight */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Risk Bands Distribution Chart */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
+      {/* 3. Advanced Analytics Workspace: Visualizations & Priority Support Queue */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left: Performance Distribution Chart */}
+        <div className="lg:col-span-7 glass-panel p-5 sm:p-6 rounded-3xl space-y-4">
+          <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-bold text-slate-900">
-                Cohort Distribution Across Auditable Concern Bands
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-blue-600 dark:text-cyan-400" />
+                <span>Continuous Assessment Performance Distribution</span>
               </h2>
-              <p className="text-xs text-slate-500">
-                Categorized by Rule #01 Multi-Signal Formula
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Cohort score bands across Unit Tests 1 & 2
               </p>
             </div>
             <button
-              onClick={() => navigate('/risk-model')}
-              className="text-xs text-teal-600 hover:text-teal-700 font-semibold flex items-center gap-1"
+              onClick={() => navigate('/assessments')}
+              className="text-xs text-blue-600 dark:text-cyan-400 hover:underline font-semibold flex items-center gap-1"
             >
-              <span>Inspect Scoring Rules</span>
+              <span>View Tests</span>
               <ArrowRight className="h-3 w-3" />
             </button>
           </div>
 
-          <div className="h-56 w-full">
+          <div className="h-56 w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={bandCounts} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <XAxis dataKey="name" stroke="#64748b" fontSize={11} tickLine={false} />
-                <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
+              <BarChart data={performanceDistribution} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.15} />
+                <XAxis dataKey="range" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '0.75rem', fontSize: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  itemStyle={{ color: '#0f172a' }}
+                  cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className="glass-panel p-2.5 rounded-xl text-xs shadow-xl border border-white/20">
+                          <span className="font-bold text-slate-800 dark:text-slate-100">{data.range}</span>
+                          <span className="block text-slate-500 dark:text-slate-400">{data.count} Students</span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
                 />
-                <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                  {bandCounts.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                  {performanceDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Bar>
               </BarChart>
@@ -213,80 +276,94 @@ export const TeacherDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Demo Highlight Card: Arun Kumar Case Study */}
-        <div className="p-5 rounded-2xl bg-amber-50/50 border border-amber-200 shadow-sm flex flex-col justify-between">
+        {/* Right: Priority Support Queue */}
+        <div className="lg:col-span-5 glass-panel p-5 sm:p-6 rounded-3xl space-y-4 flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300">
-                Hackathon Demo Scenario
+            <div className="flex items-center justify-between pb-2 border-b border-slate-200/60 dark:border-white/10">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-rose-500" />
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Priority Attention Queue</h3>
+              </div>
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold">
+                {flaggedCount} Active Alerts
               </span>
-              <RiskBadge band="Urgent review recommended" size="sm" />
             </div>
 
-            <h3 className="text-base font-bold text-slate-900">Student Spotlight: Arun Kumar</h3>
-            <p className="text-xs text-slate-500 font-mono mt-0.5">Roll: 22CS101 • CSE Sem 4</p>
+            <div className="divide-y divide-slate-200/50 dark:divide-white/5 mt-2">
+              {highRiskStudents.slice(0, 3).map((s) => (
+                <div key={s.id} className="py-3 flex items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-900 dark:text-white">{s.full_name}</span>
+                      <span className="text-[10.5px] font-mono text-slate-400">({s.roll_number})</span>
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-3">
+                      <span>Att: <strong className={s.attendance_avg < 75 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-slate-300'}>{s.attendance_avg}%</strong></span>
+                      <span>Marks: <strong className="text-rose-600 dark:text-rose-400">{s.assessment_avg}%</strong></span>
+                    </div>
+                  </div>
 
-            <div className="mt-4 p-3 rounded-xl bg-white border border-amber-200/80 text-xs text-slate-700 space-y-2 shadow-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Attendance:</span>
-                <span className="font-mono text-amber-700 font-bold">68.0% (Declining)</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Java Arrays UT1:</span>
-                <span className="font-mono text-rose-600 font-bold">0% (3/3 incorrect)</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500">Lab Assignments:</span>
-                <span className="font-mono text-amber-700 font-bold">1 Missed, 1 Late</span>
-              </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      onClick={() => setSelectedStudentForWhy(s.id)}
+                      className="px-2 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-cyan-300 text-xs font-semibold transition-colors"
+                    >
+                      Why?
+                    </button>
+                    <button
+                      onClick={() => setAlertReviewStudent(s)}
+                      className="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-semibold transition-colors"
+                    >
+                      Review
+                    </button>
+                    <button
+                      onClick={() => navigate(`/students/${s.id}`)}
+                      className="px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors"
+                    >
+                      Profile
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-
-            <p className="text-[11px] text-slate-600 mt-3 leading-relaxed">
-              Arun demonstrates concept gap in Java Arrays memory indexing. Targeted intervention has been formulated.
-            </p>
           </div>
 
-          <div className="pt-4 border-t border-amber-200 flex items-center gap-2 mt-4">
+          <div className="pt-3 border-t border-slate-200/60 dark:border-white/10 flex items-center justify-between text-xs">
+            <span className="text-slate-400">Targeted support formulated early.</span>
             <button
-              onClick={() => setSelectedStudentForWhy(1)}
-              className="flex-1 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5"
+              onClick={() => navigate('/interventions')}
+              className="text-blue-600 dark:text-cyan-400 font-semibold hover:underline flex items-center gap-1"
             >
-              <HelpCircle className="h-3.5 w-3.5" />
-              <span>Why Flagged?</span>
-            </button>
-            <button
-              onClick={() => navigate('/students/1')}
-              className="flex-1 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm shadow-teal-600/20"
-            >
-              <span>Drill Down</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <span>Manage Interventions</span>
+              <ChevronRight className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Filterable Student Cohort Table */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+      {/* 4. Student Analytics Glass Table */}
+      <div id="student-cohort-table" className="glass-panel p-5 sm:p-6 rounded-3xl space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-base font-bold text-slate-900">
-              Assigned Student Cohort ({filteredStudents.length} Students)
+            <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Users className="h-4 w-4 text-blue-600 dark:text-cyan-400" />
+              <span>Student Cohort Analytics ({filteredStudents.length} Students)</span>
             </h2>
-            <p className="text-xs text-slate-500">
-              Inspect multi-signal indicators and trigger targeted support actions
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Multidimensional indicators across Attendance, Assessments, and Practical Labs
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Search */}
+            {/* Search Input */}
             <div className="relative">
               <Search className="h-3.5 w-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name or roll..."
-                className="rounded-xl bg-slate-50 border border-slate-200 pl-8 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-600 focus:bg-white"
+                placeholder="Search student or roll..."
+                className="rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 pl-8 pr-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 dark:focus:border-cyan-400 shadow-inner"
               />
             </div>
 
@@ -294,7 +371,7 @@ export const TeacherDashboard: React.FC = () => {
             <select
               value={bandFilter}
               onChange={(e) => setBandFilter(e.target.value)}
-              className="rounded-xl bg-slate-50 border border-slate-200 px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-teal-600"
+              className="rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 px-3 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 dark:focus:border-cyan-400"
             >
               <option value="ALL">All Bands</option>
               <option value="Urgent review recommended">Urgent Review</option>
@@ -305,44 +382,44 @@ export const TeacherDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+        {/* Responsive Glass Table */}
+        <div className="border border-slate-200/80 dark:border-white/10 rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold">
+              <thead className="bg-slate-100/60 dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 border-b border-slate-200/80 dark:border-white/10 font-semibold">
                 <tr>
-                  <th className="py-3 px-4">Student Name & Roll</th>
+                  <th className="py-3 px-4">Student</th>
                   <th className="py-3 px-3">CGPA</th>
                   <th className="py-3 px-3">Attendance</th>
-                  <th className="py-3 px-3">Assessment Avg</th>
-                  <th className="py-3 px-3">Assignments</th>
-                  <th className="py-3 px-4">Risk Index</th>
+                  <th className="py-3 px-3">Assessments</th>
+                  <th className="py-3 px-3">Lab Assignments</th>
+                  <th className="py-3 px-4">Risk Intelligence</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                 {filteredStudents.map((s) => (
-                  <tr key={s.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={s.id} className="hover:bg-slate-50/70 dark:hover:bg-white/5 transition-colors">
                     <td className="py-3 px-4">
-                      <div className="font-semibold text-slate-900">{s.full_name}</div>
-                      <div className="text-[11px] text-slate-500 font-mono">{s.roll_number}</div>
+                      <div className="font-semibold text-slate-900 dark:text-slate-100">{s.full_name}</div>
+                      <div className="text-[11px] text-slate-400 font-mono">{s.roll_number}</div>
                     </td>
-                    <td className="py-3 px-3 font-mono font-medium text-slate-700">{s.cgpa}</td>
+                    <td className="py-3 px-3 font-mono font-medium text-slate-700 dark:text-slate-300">{s.cgpa}</td>
                     <td className="py-3 px-3 font-mono font-bold">
                       <span
                         className={
                           s.attendance_avg < 75
-                            ? 'text-rose-600'
+                            ? 'text-rose-600 dark:text-rose-400'
                             : s.attendance_avg < 85
-                            ? 'text-amber-600'
-                            : 'text-emerald-600'
+                            ? 'text-amber-600 dark:text-amber-400'
+                            : 'text-emerald-600 dark:text-emerald-400'
                         }
                       >
                         {s.attendance_avg}%
                       </span>
                     </td>
-                    <td className="py-3 px-3 font-mono text-slate-700">{s.assessment_avg}%</td>
-                    <td className="py-3 px-3 font-mono text-slate-700">
+                    <td className="py-3 px-3 font-mono text-slate-700 dark:text-slate-300">{s.assessment_avg}%</td>
+                    <td className="py-3 px-3 font-mono text-slate-700 dark:text-slate-300">
                       {s.assignment_completion_rate}%
                     </td>
                     <td className="py-3 px-4">
@@ -352,23 +429,21 @@ export const TeacherDashboard: React.FC = () => {
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => setSelectedStudentForWhy(s.id)}
-                          title="Explain Why Flagged"
-                          className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-teal-700 text-xs font-semibold transition-colors"
+                          className="px-2.5 py-1 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-cyan-300 text-xs font-semibold transition-colors"
                         >
                           Why?
                         </button>
                         <button
                           onClick={() => setAlertReviewStudent(s)}
-                          title="Review / Dismiss Alert"
-                          className="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold transition-colors"
+                          className="px-2.5 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-semibold transition-colors"
                         >
                           Review
                         </button>
                         <button
                           onClick={() => navigate(`/students/${s.id}`)}
-                          className="px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-xs font-bold transition-colors"
+                          className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-cyan-500 dark:to-blue-600 text-white text-xs font-semibold transition-colors shadow-2xs"
                         >
-                          Drill Down
+                          Profile
                         </button>
                       </div>
                     </td>

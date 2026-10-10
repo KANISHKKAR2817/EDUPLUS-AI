@@ -9,11 +9,15 @@ def build_academic_knowledge_graph(
     db: Session,
     course_id: Optional[int] = None,
     student_id: Optional[int] = None,
-    limit_nodes: int = 200
+    limit_nodes: int = 100
 ) -> Dict[str, Any]:
     """
     Rule #02: Queryable Academic Knowledge Graph.
-    Extracts real entities and traversable relationships from relational tables.
+    Generates a precise pedagogical ontology:
+    Course -> CONTAINS -> Concepts with PREREQUISITE_OF relationships.
+    Connects struggling students via STRUGGLES_WITH, interventions via TARGETS,
+    and assessments via ASSESSES.
+    Excludes low-level individual question and file noise for a clean, actionable graph.
     """
     nodes = []
     edges = []
@@ -38,10 +42,28 @@ def build_academic_knowledge_graph(
                 "label": label
             })
 
-    # 1. Fetch Courses
+    # Pedagogical prerequisite dependencies across computer science topics
+    PREREQUISITES_MAP = {
+        "Java Arrays & Indexing": "Conditions & Loops",
+        "Classes and Objects": "Java Arrays & Indexing",
+        "Inheritance & Polymorphism": "Classes and Objects",
+        "Exception Handling": "Classes and Objects",
+        "Stacks & Queues": "Linked Lists",
+        "Binary Trees": "Stacks & Queues",
+        "Sorting & Searching": "Java Arrays & Indexing",
+        "Normalization (1NF-BCNF)": "ER Modeling & Relational Schema",
+        "Transactions & ACID Properties": "SQL Queries & Joins",
+        "Graph Theory & Trees": "Propositional & Predicate Logic",
+        "Recurrence Relations": "Set Theory & Relations",
+    }
+
+    # 1. Fetch Targeted Courses
     courses_query = db.query(Course)
     if course_id:
         courses_query = courses_query.filter(Course.id == course_id)
+    else:
+        # Default to CS201 (Java Programming) if not filtered to keep graph crisp and readable
+        courses_query = courses_query.filter(Course.code.in_(["CS201", "CS202"]))
     courses = courses_query.all()
     selected_course_ids = {c.id for c in courses}
 
@@ -50,87 +72,100 @@ def build_academic_knowledge_graph(
             f"course_{c.id}",
             f"{c.code}: {c.title}",
             "Course",
-            {"code": c.code, "credits": c.credits, "semester": c.semester, "department": c.department}
+            {
+                "code": c.code,
+                "credits": c.credits,
+                "semester": c.semester,
+                "department": c.department,
+                "description": c.description or ""
+            }
         )
 
-    # 2. Fetch Concepts
+    # 2. Fetch Concepts for selected courses
     concepts = db.query(Concept).filter(Concept.course_id.in_(selected_course_ids)).all() if selected_course_ids else []
-    concept_map = {}
+    concept_by_name = {}
+    concept_by_id = {}
+
     for conc in concepts:
-        concept_map[conc.id] = conc
+        concept_by_name[conc.name] = conc
+        concept_by_id[conc.id] = conc
         cid = f"concept_{conc.id}"
         add_node(
             cid,
             conc.name,
             "Concept",
-            {"category": conc.category, "difficulty": conc.difficulty_level, "course_id": conc.course_id}
+            {
+                "category": conc.category,
+                "difficulty": conc.difficulty_level,
+                "course_id": conc.course_id
+            }
         )
         add_edge(f"edge_c_contains_{conc.id}", f"course_{conc.course_id}", cid, "CONTAINS")
 
-    # 3. Fetch Students
+    # Add pedagogical PREREQUISITE_OF edges between concepts
+    for conc_name, prereq_name in PREREQUISITES_MAP.items():
+        if conc_name in concept_by_name and prereq_name in concept_by_name:
+            prereq_obj = concept_by_name[prereq_name]
+            curr_obj = concept_by_name[conc_name]
+            add_edge(
+                f"edge_prereq_{prereq_obj.id}_{curr_obj.id}",
+                f"concept_{prereq_obj.id}",
+                f"concept_{curr_obj.id}",
+                "PREREQUISITE_OF"
+            )
+
+    # 3. Fetch Relevant Student(s)
+    # Focus on students with active interventions or the requested student
     students_query = db.query(StudentProfile)
     if student_id:
         students_query = students_query.filter(StudentProfile.id == student_id)
-    students = students_query.limit(20).all()
+    else:
+        # Include top flagged student (e.g. Arun Kumar) for actionable insights
+        students_query = students_query.filter(StudentProfile.roll_number.in_(["22CS101", "22CS102"]))
 
-    for s in students:
+    relevant_students = students_query.all()
+    for s in relevant_students:
         sid = f"student_{s.id}"
         s_name = s.user.full_name if s.user else s.roll_number
         add_node(
             sid,
             f"{s_name} ({s.roll_number})",
             "Student",
-            {"roll_number": s.roll_number, "cgpa": s.cgpa, "semester": s.semester, "department": s.department}
+            {
+                "roll_number": s.roll_number,
+                "cgpa": s.cgpa,
+                "semester": s.semester,
+                "department": s.department
+            }
         )
-        # Enrollment edges
         for enr in s.enrollments:
             if enr.course_id in selected_course_ids:
                 add_edge(f"edge_enr_{s.id}_{enr.course_id}", sid, f"course_{enr.course_id}", "ENROLLED_IN")
 
-    # 4. Fetch Assessments & Questions
+    # 4. Fetch Key Assessments (e.g. UT1, UT2)
     assessments = db.query(Assessment).filter(Assessment.course_id.in_(selected_course_ids)).all() if selected_course_ids else []
-    for ass in assessments:
+    for ass in assessments[:3]:  # Keep to core continuous assessments to prevent clutter
         aid = f"assessment_{ass.id}"
         add_node(
             aid,
             ass.title,
             "Assessment",
-            {"type": ass.assessment_type, "max_marks": ass.max_marks, "course_id": ass.course_id}
+            {
+                "type": ass.assessment_type,
+                "max_marks": ass.max_marks,
+                "course_id": ass.course_id
+            }
         )
         add_edge(f"edge_c_assesses_{ass.id}", f"course_{ass.course_id}", aid, "ASSESSES")
 
-        # Questions linked to assessment
-        for q in ass.questions[:5]:  # limit questions per assessment to keep graph readable
-            qid = f"question_{q.id}"
-            add_node(
-                qid,
-                f"Q{q.id}: {q.question_text[:30]}...",
-                "Question",
-                {"max_marks": q.max_marks, "type": q.question_type}
-            )
-            add_edge(f"edge_ass_has_q_{q.id}", aid, qid, "CONTAINS_QUESTION")
-
-            # Question TESTS Concept
-            for qc in q.concept_links:
-                if qc.concept_id in concept_map:
-                    add_edge(f"edge_q_tests_{q.id}_{qc.concept_id}", qid, f"concept_{qc.concept_id}", "TESTS")
-
-    # 5. Fetch Learning Materials
-    materials = db.query(LearningMaterial).filter(LearningMaterial.course_id.in_(selected_course_ids)).all() if selected_course_ids else []
-    for mat in materials:
-        mid = f"material_{mat.id}"
-        add_node(
-            mid,
-            mat.title,
-            "LearningMaterial",
-            {"file_type": mat.file_type, "course_id": mat.course_id}
-        )
-        add_edge(f"edge_c_provides_{mat.id}", f"course_{mat.course_id}", mid, "PROVIDES_RESOURCE")
-
-    # 6. Fetch Interventions and Student Struggle edges
+    # 5. Fetch Targeted Interventions
     interventions_query = db.query(Intervention)
     if student_id:
         interventions_query = interventions_query.filter(Intervention.student_id == student_id)
+    else:
+        interventions_query = interventions_query.filter(
+            Intervention.student_id.in_([s.id for s in relevant_students])
+        )
     interventions = interventions_query.all()
 
     for intv in interventions:
@@ -143,14 +178,16 @@ def build_academic_knowledge_graph(
                 "status": intv.status,
                 "outcome": intv.outcome,
                 "baseline_accuracy": intv.baseline_accuracy,
-                "follow_up_accuracy": intv.follow_up_accuracy
+                "follow_up_accuracy": intv.follow_up_accuracy,
+                "recommended_action": intv.recommended_action
             }
         )
         sid = f"student_{intv.student_id}"
         add_edge(f"edge_s_receives_{intv.id}", sid, iid, "RECEIVES")
-        if intv.concept_id:
-            add_edge(f"edge_intv_targets_{intv.id}", iid, f"concept_{intv.concept_id}", "TARGETS")
-            add_edge(f"edge_s_struggles_{intv.student_id}_{intv.concept_id}", sid, f"concept_{intv.concept_id}", "STRUGGLES_WITH")
+        if intv.concept_id and intv.concept_id in concept_by_id:
+            cid = f"concept_{intv.concept_id}"
+            add_edge(f"edge_intv_targets_{intv.id}", iid, cid, "TARGETS")
+            add_edge(f"edge_s_struggles_{intv.student_id}_{intv.concept_id}", sid, cid, "STRUGGLES_WITH")
 
     return {
         "nodes": nodes,

@@ -14,7 +14,10 @@ import {
   Bot,
   HelpCircle,
   FileCheck,
-  Award
+  Award,
+  Activity,
+  Layers,
+  GraduationCap
 } from 'lucide-react';
 
 export const StudentDashboard: React.FC = () => {
@@ -118,150 +121,139 @@ export const StudentDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Student Welcome Banner */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-teal-50 via-white to-emerald-50 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* Student Welcome Header Card */}
+      <div className="p-6 rounded-2xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-200">
-              Student Academic Learning Hub
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+              Student Adaptive Learning Hub
             </span>
-            <span className="text-xs text-slate-500 font-medium">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
               Roll: {studentDetail?.roll_number || user?.roll_number || '22CS101'}
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             Welcome back, {studentDetail?.full_name || user?.full_name || 'Arun Kumar'}!
           </h1>
-          <p className="text-xs text-slate-600 mt-1 max-w-xl leading-relaxed">
-            Here is your real-time learning health overview. Review your concept mastery, complete targeted practice tasks, and receive personalized assistance.
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Track your concept mastery in real-time, complete targeted remedial exercises, and maintain exam readiness.
           </p>
         </div>
 
         {risk && (
-          <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-sm text-right">
-            <span className="text-[11px] font-medium text-slate-500 block">Personal Academic Health</span>
-            <div className="mt-1 flex items-center justify-end gap-2">
-              <RiskBadge band={risk.band} score={risk.overall_score} size="md" />
-            </div>
+          <div className="flex items-center gap-3 shrink-0 p-3 rounded-xl glass-card border border-slate-200/80 dark:border-white/10">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Academic Health:</span>
+            <RiskBadge band={risk.band} score={risk.overall_score} size="md" />
           </div>
         )}
       </div>
 
-      {/* Metric Highlights */}
+      {/* 4 Glassmorphic Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Cumulative GPA</span>
+        <div className="p-5 rounded-2xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-xs hover:border-cyan-500/40 transition-all">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Cumulative GPA</span>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold font-mono text-slate-900">
+            <span className="text-3xl font-black font-mono text-slate-900 dark:text-white">
               {studentDetail?.cgpa || 6.2}
             </span>
-            <span className="text-xs text-slate-400 font-medium">/ 10.0</span>
+            <span className="text-xs text-slate-400">/ 10.0</span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Semester 4 • CSE</p>
+          <div className="mt-2 text-[11px] text-cyan-600 dark:text-cyan-400 font-medium flex items-center gap-1">
+            <TrendingUp className="h-3 w-3" />
+            <span>Target: 7.50+ by Semester End</span>
+          </div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Current Attendance</span>
+        <div className="p-5 rounded-2xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-xs hover:border-amber-500/40 transition-all">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Current Attendance</span>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold font-mono text-amber-600">
+            <span className="text-3xl font-black font-mono text-amber-600 dark:text-amber-400">
               {studentDetail?.attendance?.[0]?.percentage || 68.0}%
             </span>
-            <span className="text-xs text-amber-700 font-medium font-mono">Benchmark: 75%</span>
+            <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">Min: 75% Required</span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">32 / 40 classes attended</p>
+          <div className="mt-2 text-[11px] text-amber-600 dark:text-amber-400 font-medium">
+            3 more classes needed to reach 75%
+          </div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Support Tasks</span>
+        <div className="p-5 rounded-2xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-xs hover:border-cyan-500/40 transition-all">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Active Tasks</span>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold font-mono text-teal-600">
+            <span className="text-3xl font-black font-mono text-cyan-600 dark:text-cyan-400">
               {studentDetail?.interventions?.filter((i: any) => i.status !== 'completed').length || 1}
             </span>
-            <span className="text-xs text-teal-700 font-medium">Pending Follow-up</span>
+            <span className="text-xs text-cyan-700 dark:text-cyan-300 font-medium">Verification Pending</span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Targeted practice interventions</p>
+          <div className="mt-2 text-[11px] text-cyan-600 dark:text-cyan-400 font-medium">
+            Complete to clear academic warning
+          </div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Verified Improvements</span>
+        <div className="p-5 rounded-2xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-xs hover:border-emerald-500/40 transition-all">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Mastery Verified</span>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold font-mono text-emerald-600">
+            <span className="text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400">
               {studentDetail?.interventions?.filter((i: any) => i.outcome === 'improved').length || 0}
             </span>
-            <span className="text-xs text-emerald-700 font-medium">Concept Gaps Resolved</span>
+            <span className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">Gaps Resolved</span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Backed by post-quiz scores</p>
+          <div className="mt-2 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+            Auditable evidence stored
+          </div>
         </div>
       </div>
 
-      {/* Flagged Support Explanation (Empathetic, Supportive Language) */}
-      {risk && risk.band !== 'Low concern' && (
-        <div className="p-5 rounded-2xl bg-gradient-to-r from-amber-50/70 via-white to-teal-50/50 border border-amber-200/80 shadow-sm space-y-3">
-          <div className="flex items-center gap-2.5">
-            <Sparkles className="h-4 w-4 text-amber-600" />
-            <h2 className="text-sm font-bold text-slate-900">
-              How EduPulse is Helping You Prepare For Success
-            </h2>
-          </div>
-          <p className="text-xs text-slate-700 leading-relaxed">
-            Your recent attendance ({studentDetail?.attendance?.[0]?.percentage || 68}%) and Java Unit Test 1 scores showed areas that could benefit from quick revision. Rather than waiting for semester exams, we’ve highlighted these concepts now so you have ample time to master them and succeed with confidence.
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 pt-2">
-            {risk.components?.map((c: any, i: number) => (
-              <div key={i} className="p-3 rounded-xl bg-white border border-slate-200 shadow-xs text-xs">
-                <span className="text-slate-500 text-[11px] block">{c.name}</span>
-                <span className="font-bold text-slate-800 block mt-0.5">{c.raw_metric}</span>
-                <span className="text-[10px] text-teal-600 font-semibold mt-1 block">{c.status_label} Signal</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Active Interventions & Follow-Up Quiz Section */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="p-6 rounded-2xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-md space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-base font-bold text-slate-900">
-              My Targeted Support Tasks & Verification Quizzes
+            <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <FileCheck className="h-5 w-5 text-cyan-500" />
+              <span>Targeted Remedial Tasks & Verification Quizzes</span>
             </h2>
-            <p className="text-xs text-slate-500">
-              Complete these targeted learning steps to verify mastery and update your performance record
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Complete these targeted practice tasks to demonstrate improvement and automatically clear your risk flag.
             </p>
           </div>
+          <button
+            onClick={() => navigate('/ai-tutor')}
+            className="px-3.5 py-1.5 rounded-xl glass-card border border-cyan-500/30 text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+          >
+            <Bot className="h-4 w-4" />
+            <span>Consult AI Tutor</span>
+          </button>
         </div>
 
         <div className="space-y-3">
           {studentDetail?.interventions?.map((intv: any) => (
             <div
               key={intv.id}
-              className="p-5 rounded-xl bg-slate-50/80 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4"
+              className="p-5 rounded-xl glass-card border border-slate-200/80 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4"
             >
               <div className="space-y-1.5 max-w-xl">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-teal-800">{intv.title}</span>
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">{intv.title}</span>
                   <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${
                       intv.status === 'completed'
-                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                        : 'bg-amber-100 text-amber-800 border border-amber-200'
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
                     }`}
                   >
-                    {intv.status === 'completed' ? 'Completed & Verified' : 'Action Required'}
+                    {intv.status === 'completed' ? 'Verified Improved' : 'Action Required'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-700">{intv.recommended_action}</p>
-                <div className="flex items-center gap-4 text-[11px] text-slate-500 pt-1">
-                  <span>Baseline Accuracy: <strong className="text-rose-600 font-mono">{intv.baseline_accuracy}%</strong></span>
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{intv.recommended_action}</p>
+                <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 pt-1">
+                  <span>Baseline: <strong className="text-rose-600 dark:text-rose-400 font-mono">{intv.baseline_accuracy}%</strong></span>
                   {intv.follow_up_accuracy !== null && (
                     <span>
-                      Follow-up Score: <strong className="text-emerald-600 font-mono">{intv.follow_up_accuracy}%</strong>
+                      Follow-up Score: <strong className="text-emerald-600 dark:text-emerald-400 font-mono">{intv.follow_up_accuracy}%</strong>
                     </span>
                   )}
                   {intv.outcome && intv.outcome !== 'pending' && (
-                    <span className="text-emerald-700 font-bold flex items-center gap-1">
-                      <Award className="h-3 w-3" />
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">
                       Outcome: {intv.outcome.toUpperCase()}
                     </span>
                   )}
@@ -276,13 +268,13 @@ export const StudentDashboard: React.FC = () => {
                       setQuizSubmitted(false);
                       setQuizAnswers({});
                     }}
-                    className="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-2"
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold text-xs shadow-md shadow-cyan-600/20 transition-all flex items-center gap-1.5"
                   >
                     <FileCheck className="h-4 w-4" />
-                    <span>Attempt Follow-up Quiz</span>
+                    <span>Attempt Verification Quiz</span>
                   </button>
                 ) : (
-                  <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 px-3.5 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
                     <CheckCircle className="h-4 w-4" />
                     <span>Mastery Verified</span>
                   </div>
@@ -293,50 +285,42 @@ export const StudentDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Concept Mastery Progress */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold text-slate-900">
-              Concept Mastery Tracker
-            </h2>
-            <p className="text-xs text-slate-500">
-              Calculated from question-level attempts across all continuous assessments
-            </p>
-          </div>
-          <button
-            onClick={() => navigate('/ai-tutor')}
-            className="text-xs text-teal-600 hover:text-teal-700 font-semibold flex items-center gap-1.5"
-          >
-            <Bot className="h-3.5 w-3.5" />
-            <span>Ask AI Tutor to Explain Weak Concepts</span>
-          </button>
+      {/* Concept Mastery Tracker */}
+      <div className="p-6 rounded-2xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-md space-y-4">
+        <div>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Layers className="h-5 w-5 text-violet-500" />
+            <span>Concept Mastery Overview</span>
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Dynamically computed from lab assessments, unit tests, and continuous evaluations.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {conceptMastery.map((conc) => {
             const pct = conc.accuracy_percentage;
-            let barColor = 'bg-emerald-500';
-            if (pct < 50) barColor = 'bg-rose-500';
-            else if (pct < 75) barColor = 'bg-amber-500';
+            let barColor = 'bg-gradient-to-r from-emerald-500 to-teal-400';
+            if (pct < 50) barColor = 'bg-gradient-to-r from-rose-500 to-orange-400';
+            else if (pct < 75) barColor = 'bg-gradient-to-r from-amber-500 to-yellow-400';
 
             return (
-              <div key={conc.concept_id} className="p-4 rounded-xl bg-slate-50/70 border border-slate-200 space-y-2">
+              <div key={conc.concept_id} className="p-4 rounded-xl glass-card border border-slate-200/80 dark:border-white/10 space-y-2">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="font-semibold text-xs text-slate-900">{conc.concept_name}</span>
-                    <span className="text-[10px] text-slate-500 block">{conc.course_code}: {conc.course_title}</span>
+                    <span className="font-semibold text-xs text-slate-900 dark:text-white">{conc.concept_name}</span>
+                    <span className="text-[10px] text-slate-400 block font-mono">{conc.course_code}</span>
                   </div>
-                  <span className="font-mono text-xs font-bold text-slate-800">{pct}%</span>
+                  <span className="font-mono text-xs font-bold text-slate-900 dark:text-white">{pct}%</span>
                 </div>
 
-                <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
                   <div className={`h-full ${barColor} transition-all duration-300`} style={{ width: `${pct}%` }} />
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
-                  <span>{conc.correct_attempts} / {conc.total_attempts} questions correct</span>
-                  <span className={conc.needs_intervention ? 'text-amber-700 font-semibold' : 'text-slate-500'}>
+                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-0.5">
+                  <span>{conc.correct_attempts} / {conc.total_attempts} correct</span>
+                  <span className={conc.needs_intervention ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-slate-400'}>
                     {conc.recent_performance}
                   </span>
                 </div>
@@ -348,20 +332,20 @@ export const StudentDashboard: React.FC = () => {
 
       {/* Follow-up Quiz Modal */}
       {activeQuizIntv && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-2xl shadow-2xl p-6 text-slate-800 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-md animate-in fade-in">
+          <div className="relative w-full max-w-2xl glass-panel rounded-2xl shadow-2xl p-6 text-slate-800 dark:text-slate-100 max-h-[90vh] overflow-y-auto border border-slate-200/80 dark:border-white/10">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200/60 dark:border-white/10">
               <div>
-                <h3 className="text-base font-bold text-slate-900">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
                   Follow-Up Verification Quiz: Java Arrays
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Demonstrate understanding to update intervention outcome from 0% baseline
                 </p>
               </div>
               <button
                 onClick={() => setActiveQuizIntv(null)}
-                className="text-slate-500 hover:text-slate-800 text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors font-medium"
+                className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 transition-colors font-medium"
               >
                 Close
               </button>
@@ -370,8 +354,8 @@ export const StudentDashboard: React.FC = () => {
             {!quizSubmitted ? (
               <form onSubmit={handleQuizSubmit} className="py-4 space-y-5">
                 {followUpQuizQuestions.map((q, idx) => (
-                  <div key={q.id} className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
-                    <span className="text-xs font-semibold text-slate-900 block">
+                  <div key={q.id} className="p-4 rounded-xl glass-card border border-slate-200/80 dark:border-white/10 space-y-2.5">
+                    <span className="text-xs font-semibold text-slate-900 dark:text-white block">
                       {idx + 1}. {q.q}
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -382,8 +366,8 @@ export const StudentDashboard: React.FC = () => {
                           onClick={() => handleQuizAnswer(q.id, opt)}
                           className={`p-2.5 rounded-lg text-left text-xs transition-colors border ${
                             quizAnswers[q.id] === opt
-                              ? 'bg-teal-50 border-teal-600 text-teal-800 font-semibold ring-1 ring-teal-600'
-                              : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                              ? 'bg-cyan-500/15 border-cyan-500 text-cyan-600 dark:text-cyan-300 font-semibold ring-1 ring-cyan-500'
+                              : 'bg-white/60 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
                           }`}
                         >
                           {opt}
@@ -397,7 +381,7 @@ export const StudentDashboard: React.FC = () => {
                   <button
                     type="submit"
                     disabled={Object.keys(quizAnswers).length < followUpQuizQuestions.length}
-                    className="px-6 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-sm transition-all disabled:opacity-50"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold text-xs shadow-md shadow-cyan-600/20 transition-all disabled:opacity-50"
                   >
                     Submit Quiz & Record Evidence
                   </button>
@@ -405,36 +389,36 @@ export const StudentDashboard: React.FC = () => {
               </form>
             ) : (
               <div className="py-6 text-center space-y-4">
-                <div className="h-14 w-14 rounded-full bg-emerald-100 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto">
+                <div className="h-16 w-16 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 flex items-center justify-center mx-auto">
                   <Award className="h-8 w-8" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                   Congratulations! Learning Improvement Verified
                 </h3>
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 max-w-md mx-auto space-y-2 text-xs">
+                <div className="p-4 rounded-xl glass-card border border-slate-200/80 dark:border-white/10 max-w-md mx-auto space-y-2 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Baseline Assessment:</span>
-                    <span className="text-rose-600 font-mono font-bold">{quizResult?.baseline_accuracy}%</span>
+                    <span className="text-slate-500 dark:text-slate-400">Baseline Assessment:</span>
+                    <span className="text-rose-600 dark:text-rose-400 font-mono font-bold">{quizResult?.baseline_accuracy}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Follow-up Quiz Score:</span>
-                    <span className="text-emerald-600 font-mono font-bold">{quizResult?.follow_up_accuracy}%</span>
+                    <span className="text-slate-500 dark:text-slate-400">Follow-up Quiz Score:</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-mono font-bold">{quizResult?.follow_up_accuracy}%</span>
                   </div>
-                  <div className="flex justify-between border-t border-slate-200 pt-1.5">
-                    <span className="text-slate-500">Improvement Delta:</span>
-                    <span className="text-teal-700 font-mono font-bold">+{quizResult?.delta}%</span>
+                  <div className="flex justify-between border-t border-slate-200/60 dark:border-white/10 pt-1.5">
+                    <span className="text-slate-500 dark:text-slate-400">Improvement Delta:</span>
+                    <span className="text-cyan-600 dark:text-cyan-400 font-mono font-bold">+{quizResult?.delta}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Official Intervention Status:</span>
-                    <span className="text-emerald-700 font-bold uppercase">{quizResult?.outcome}</span>
+                    <span className="text-slate-500 dark:text-slate-400">Official Intervention Status:</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold uppercase">{quizResult?.outcome}</span>
                   </div>
                 </div>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                   Your updated before-and-after learning evidence has been logged and is now visible on your teacher’s audit trail!
                 </p>
                 <button
                   onClick={() => setActiveQuizIntv(null)}
-                  className="px-6 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 border border-slate-200 transition-colors"
+                  className="px-6 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 transition-colors"
                 >
                   Return to Dashboard
                 </button>

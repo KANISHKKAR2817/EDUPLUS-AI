@@ -5,7 +5,7 @@ import { RiskBadge } from '../components/RiskBadge';
 import { WhyFlaggedModal } from '../components/WhyFlaggedModal';
 import { AlertReviewModal } from '../components/AlertReviewModal';
 import { useNavigate } from 'react-router-dom';
-import { Users, Search, Filter, ArrowUpDown, HelpCircle, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Users, Search, Filter, ArrowUpDown, HelpCircle, ShieldCheck, ArrowRight, Activity, TrendingUp } from 'lucide-react';
 
 export const StudentDirectory: React.FC = () => {
   const navigate = useNavigate();
@@ -54,20 +54,20 @@ export const StudentDirectory: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-teal-50 via-white to-slate-50 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="p-6 rounded-2xl glass-panel border border-slate-200/80 dark:border-white/10 shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-200">
-              Cohort Directory
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+              Cohort Intelligence Directory
             </span>
-            <span className="text-xs text-slate-500 font-medium">Total Enrolled: {students.length} Students</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Enrolled: {students.length} Students</span>
           </div>
-          <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-            <Users className="h-6 w-6 text-teal-600" />
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            <Users className="h-6 w-6 text-cyan-500" />
             <span>Student Performance & Risk Directory</span>
           </h1>
-          <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
-            Sort and filter through students to identify potential learning difficulties early and launch personalized support.
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
+            Continuously evaluate all students across attendance, internal assessments, assignment completion, and grade velocity.
           </p>
         </div>
 
@@ -79,15 +79,15 @@ export const StudentDirectory: React.FC = () => {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, roll number..."
-              className="rounded-xl bg-white border border-slate-300 pl-8 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 shadow-2xs"
+              placeholder="Search name, roll..."
+              className="rounded-xl bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 shadow-2xs"
             />
           </div>
 
           <select
             value={bandFilter}
             onChange={(e) => setBandFilter(e.target.value)}
-            className="rounded-xl bg-white border border-slate-300 px-3 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 shadow-2xs"
+            className="rounded-xl bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 px-3 py-1.5 text-xs text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-cyan-500 shadow-2xs"
           >
             <option value="ALL">All Risk Bands</option>
             <option value="Urgent review recommended">Urgent Review</option>
@@ -99,93 +99,117 @@ export const StudentDirectory: React.FC = () => {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="rounded-xl bg-white border border-slate-300 px-3 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 shadow-2xs"
+            className="rounded-xl bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 px-3 py-1.5 text-xs text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-cyan-500 shadow-2xs"
           >
-            <option value="risk">Sort by Highest Risk</option>
-            <option value="attendance">Sort by Lowest Attendance</option>
-            <option value="cgpa">Sort by CGPA</option>
+            <option value="risk">Sort by Risk Index (Highest First)</option>
+            <option value="attendance">Sort by Attendance (Lowest First)</option>
+            <option value="cgpa">Sort by CGPA (Highest First)</option>
           </select>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
-        <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
-                <tr>
-                  <th className="py-3 px-4 font-semibold">Student Name & Roll</th>
-                  <th className="py-3 px-3 font-semibold">Department</th>
-                  <th className="py-3 px-3 font-semibold">CGPA</th>
-                  <th className="py-3 px-3 font-semibold">Attendance Avg</th>
-                  <th className="py-3 px-3 font-semibold">Continuous Marks</th>
-                  <th className="py-3 px-3 font-semibold">Assignments</th>
-                  <th className="py-3 px-4 font-semibold">Auditable Risk Index</th>
-                  <th className="py-3 px-4 font-semibold text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 bg-white">
-                {filtered.map((s) => (
-                  <tr key={s.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3 px-4">
-                      <div className="font-semibold text-slate-900">{s.full_name}</div>
-                      <div className="text-[11px] text-slate-400 font-mono">{s.roll_number}</div>
-                    </td>
-                    <td className="py-3 px-3 text-slate-600 font-medium">{s.department}</td>
-                    <td className="py-3 px-3 font-mono font-medium text-slate-800">{s.cgpa}</td>
-                    <td className="py-3 px-3 font-mono">
-                      <span
-                        className={
-                          s.attendance_avg < 75
-                            ? 'text-rose-600 font-semibold'
-                            : s.attendance_avg < 85
-                            ? 'text-amber-600 font-medium'
-                            : 'text-emerald-600 font-medium'
-                        }
+      {/* Glassmorphic Students Table */}
+      <div className="glass-panel border border-slate-200/80 dark:border-white/10 rounded-2xl overflow-hidden shadow-lg">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-slate-100/70 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-b border-slate-200/80 dark:border-white/10">
+              <tr>
+                <th className="py-3 px-4 font-bold">Student Identity</th>
+                <th className="py-3 px-4 font-bold">Dept & Year</th>
+                <th className="py-3 px-4 font-bold">Attendance</th>
+                <th className="py-3 px-4 font-bold">CGPA</th>
+                <th className="py-3 px-4 font-bold">Risk Assessment</th>
+                <th className="py-3 px-4 font-bold">Primary Risk Factor</th>
+                <th className="py-3 px-4 text-right font-bold">Intervention Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200/60 dark:divide-white/5">
+              {filtered.map((s) => (
+                <tr
+                  key={s.id}
+                  className="hover:bg-slate-100/50 dark:hover:bg-white/5 transition-colors group"
+                >
+                  <td className="py-3 px-4">
+                    <div className="font-bold text-slate-900 dark:text-white group-hover:text-cyan-500 transition-colors">
+                      {s.full_name}
+                    </div>
+                    <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400">{s.roll_number}</div>
+                  </td>
+
+                  <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
+                    <div>{s.department}</div>
+                    <div className="text-[11px] text-slate-400">Semester {s.semester}</div>
+                  </td>
+
+                  <td className="py-3 px-4 font-mono">
+                    <span
+                      className={`font-bold ${
+                        s.attendance_avg < 75
+                          ? 'text-amber-600 dark:text-amber-400'
+                          : 'text-slate-900 dark:text-white'
+                      }`}
+                    >
+                      {s.attendance_avg}%
+                    </span>
+                    {s.attendance_avg < 75 && (
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400 block font-sans">Below 75% req</span>
+                    )}
+                  </td>
+
+                  <td className="py-3 px-4 font-mono font-bold text-slate-900 dark:text-white">
+                    {s.cgpa}
+                  </td>
+
+                  <td className="py-3 px-4">
+                    <RiskBadge band={s.risk_band} score={s.overall_risk} size="sm" />
+                  </td>
+
+                  <td className="py-3 px-4">
+                    <span className="text-slate-600 dark:text-slate-300 font-medium">
+                      {s.flagged_concepts_count > 0
+                        ? `${s.flagged_concepts_count} foundational concept gap(s)`
+                        : s.attendance_avg < 75
+                        ? 'Low class attendance rate'
+                        : 'Consistent engagement across signals'}
+                    </span>
+                  </td>
+
+                  <td className="py-3 px-4 text-right">
+                    <div className="inline-flex items-center gap-1.5">
+                      <button
+                        onClick={() => setSelectedStudentForWhy(s.id)}
+                        title="Explain Why Flagged"
+                        className="p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 transition-colors"
                       >
-                        {s.attendance_avg}%
-                      </span>
-                    </td>
-                    <td className="py-3 px-3 font-mono text-slate-700 font-medium">{s.assessment_avg}%</td>
-                    <td className="py-3 px-3 font-mono text-slate-700 font-medium">
-                      {s.assignment_completion_rate}%
-                    </td>
-                    <td className="py-3 px-4">
-                      <RiskBadge band={s.risk_band} score={s.overall_risk} size="sm" />
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => setSelectedStudentForWhy(s.id)}
-                          className="px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-xs font-semibold transition-colors"
-                        >
-                          Why?
-                        </button>
-                        <button
-                          onClick={() => setAlertReviewStudent(s)}
-                          className="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold transition-colors"
-                        >
-                          Review
-                        </button>
-                        <button
-                          onClick={() => navigate(`/students/${s.id}`)}
-                          className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors shadow-2xs"
-                        >
-                          Drill Down
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        <HelpCircle className="h-3.5 w-3.5" />
+                      </button>
+
+                      <button
+                        onClick={() => setAlertReviewStudent(s)}
+                        title="Safeguard Review"
+                        className="p-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 transition-colors"
+                      >
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                      </button>
+
+                      <button
+                        onClick={() => navigate(`/students/${s.id}`)}
+                        className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold text-[11px] flex items-center gap-1 shadow-xs transition-all"
+                      >
+                        <span>Profile</span>
+                        <ArrowRight className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* Modals */}
-      {selectedStudentForWhy && (
+      {/* Explanatory Modals */}
+      {selectedStudentForWhy !== null && (
         <WhyFlaggedModal
           studentId={selectedStudentForWhy}
           isOpen={true}
@@ -193,14 +217,14 @@ export const StudentDirectory: React.FC = () => {
         />
       )}
 
-      {alertReviewStudent && (
+      {alertReviewStudent !== null && (
         <AlertReviewModal
           studentId={alertReviewStudent.id}
           studentName={alertReviewStudent.full_name}
           rollNumber={alertReviewStudent.roll_number}
           isOpen={true}
           onClose={() => setAlertReviewStudent(null)}
-          onSuccess={loadStudents}
+          onSuccess={() => loadStudents()}
         />
       )}
     </div>
